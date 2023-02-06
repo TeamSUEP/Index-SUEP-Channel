@@ -1,38 +1,104 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Translation Grass Messages Log</title>
-    <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@1.*/css/pico.min.css">
+    <script src="https://unpkg.com/autolinker@4.0.0/dist/autolinker.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@1.*/css/pico.min.css" />
     <style>
-        .ocr {line-height: 1.1; opacity: 0.75;}
-        img {max-width: 200px; max-height: 200px;}
+        .ocr {
+            line-height: 1.1;
+            opacity: 0.75;
+        }
+
+        img {
+            max-width: 200px;
+            max-height: 200px;
+        }
     </style>
 </head>
+
 <body class="container">
-    <h1><a href="https://t.me/s/TranslationGrass">Translation Grass</a> Messages Log</h1>
-    <p>GitHub: <a href="https://github.com/blueset/translation_grass_history">https://github.com/blueset/translation_grass_history</a></p>
-    <p>Last update: <time datetime="{{ time }}" id="lastUpdate">{{ time }}</time></p>
+    <h1>
+        <a href="https://t.me/s/TranslationGrass" target="_blank">Translation Grass</a> Messages
+        Log
+    </h1>
+    <p>
+        GitHub:
+        <a
+            href="https://github.com/blueset/translation_grass_history" target="_blank">https://github.com/blueset/translation_grass_history</a>
+    </p>
+    <p>
+        Last update: <time datetime="{{ time }}" id="lastUpdate">{{ time }}</time>
+    </p>
     <ul id="messages">
         {% for message in messages %}
-            <li id="message-{{ message['id'] }}">
-                <div class="messageId">
-                    <a href="https://t.me/TranslationGrass/{{ message['id'] }}">
-                        #{{ message['id'] }}
-                    </a>
-                </div>
-                {% if message['text'] %}<div class="messageContent">{{ message['text']|nl2br|safe }}</div>{% endif %}
-                {% if "media" in message %}
-                    <a href="images/{{ message['media'] }}" target="_blank"><img src="images/{{ message['media'] }}" alt="{{ message['ocr'] }}" loading="lazy"></a>
-                    <div class="ocr"><small><b>OCR</b>: {{ message['ocr'] |escape }}</small></div>
-                {% endif %}
-            </li>
+        <li id="message-{{ message['id'] }}">
+            <div class="messageId">
+                <a href="https://t.me/TranslationGrass/{{ message['id'] }}" target="_blank">
+                    #{{ message['id'] }}
+                </a>
+            </div>
+            {% if message['text'] %}
+            <div class="messageContent">{{ message['text']|nl2br|safe }}</div>
+            {% endif %} {% if "media" in message %}
+            <a href="images/{{ message['media'] }}" target="_blank"><img src="images/{{ message['media'] }}" loading="lazy" /></a>
+            <div class="ocr">
+                <small><b>OCR</b>: {{ message['ocr'] |escape }}</small>
+            </div>
+            {% endif %}
+        </li>
         {% endfor %}
     </ul>
     <script>
         const time = document.getElementById("lastUpdate");
-        time.innerText = `${new Date(time.innerText).toLocaleString()} (${Intl.DateTimeFormat().resolvedOptions().timeZone})`;
+        time.innerText = `${new Date(time.innerText).toLocaleString()} (${Intl.DateTimeFormat().resolvedOptions().timeZone
+            })`;
+
+        var autolinker = new Autolinker({
+            urls: {
+                schemeMatches: true,
+                tldMatches: true,
+                ipV4Matches: true,
+            },
+            email: true,
+            phone: true,
+            mention: false,
+            hashtag: false,
+
+            stripPrefix: false,
+            stripTrailingSlash: true,
+            newWindow: true,
+
+            truncate: {
+                length: 0,
+                location: "smart",
+            },
+
+            className: "",
+        });
+
+        function linkify(node) {
+            const nodes = [...node.childNodes];
+            for (var n of nodes) {
+                if (n.nodeType == n.TEXT_NODE) {
+                    const newText = autolinker.link(n.textContent);
+                    if (newText == n.textContent) {
+                        continue;
+                    }
+                    const fragment = document.createRange().createContextualFragment(newText);
+                    n.replaceWith(fragment);
+                    // console.log("replace fragment", fragment);
+                } else {
+                    linkify(n);
+                }
+            }
+        }
+
+        document.querySelectorAll(".messageContent").forEach(linkify);
     </script>
 </body>
+
 </html>
