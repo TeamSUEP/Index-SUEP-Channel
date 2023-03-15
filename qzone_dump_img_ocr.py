@@ -51,7 +51,7 @@ async def ocr_messages():
     messages = read_messages()
     print(f"OCRing messages...")
     async with aiohttp.ClientSession() as session:
-        count = 1
+        count = 0
         for message in messages:
             if message["ocr"] is not None:
                 continue
@@ -60,7 +60,7 @@ async def ocr_messages():
                 message["ocr"] = ""
                 await ocr_message(session, message)
                 print(f"OCRed message {message['tid']}.")
-                if count % AUTO_SAVE == 0:
+                if AUTO_SAVE > 0 and count % AUTO_SAVE == 0:
                     write_messages(messages, AUTO_SAVE_DIR)
                 count += 1
             else:

@@ -138,7 +138,7 @@ def dump_messages(dump_new: bool = True, dump_old: bool = True) -> int:
             print(count_new, end=": ")
             messages_new.append(dump_emotion(emotion))
             sleep(SLEEP_TIME)
-            if count_new % AUTO_SAVE == 0:
+            if AUTO_SAVE > 0 and count_new % AUTO_SAVE == 0:
                 write_messages(messages_new + messages, AUTO_SAVE_DIR)
             count_new += 1
         messages = messages_new + messages
@@ -159,7 +159,7 @@ def dump_messages(dump_new: bool = True, dump_old: bool = True) -> int:
                     else:
                         found = True
                 messages_old.append(dump_emotion(emotion))
-                if count_old % AUTO_SAVE == 0:
+                if AUTO_SAVE > 0 and count_old % AUTO_SAVE == 0:
                     write_messages(messages + messages_old, AUTO_SAVE_DIR)
                 count_old += 1
             else:
