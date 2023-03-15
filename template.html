@@ -4,7 +4,8 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Translation Grass Messages Log</title>
+    <meta name="referrer" content="no-referrer" />
+    <title>{{ nickname }}的空间</title>
     <script src="https://unpkg.com/autolinker@4.0.0/dist/autolinker.min.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@1.*/css/pico.min.css" />
     <style>
@@ -22,37 +23,63 @@
 
 <body class="container">
     <h1>
-        <a href="https://t.me/s/TranslationGrass" target="_blank">Translation Grass</a> Messages
-        Log
+        <a href="https://user.qzone.qq.com/{{ uin }}/311" target="_blank">{{ nickname }}</a>的空间 - {{ year }}年
     </h1>
-    <p>
-        GitHub:
-        <a
-            href="https://github.com/blueset/translation_grass_history" target="_blank">https://github.com/blueset/translation_grass_history</a>
-    </p>
+    {% if year == year_now %}
     <p>
         Last update: <time datetime="{{ time }}" id="lastUpdate">{{ time }}</time>
     </p>
+    {% endif %}
     <ul id="messages">
         {% for message in messages %}
         <li id="message-{{ message['id'] }}">
             <div class="messageId">
-                <a href="https://t.me/TranslationGrass/{{ message['id'] }}" target="_blank">
-                    #{{ message['id'] }}
+                <a href="https://h5.qzone.qq.com/ugc/share?appid=311&res_uin={{ uin }}&cellid={{ message['tid'] }}"
+                    target="_blank">
+                    #{{ message['tid'] }}
                 </a>
+                <time data-time="{{ message.ctime | datetime_fromtimestamp }}">{{ message.ctime | datetime_fromtimestamp
+                    }}</time>
             </div>
-            {% if message['text'] %}
-            <div class="messageContent">{{ message['text']|nl2br|safe }}</div>
-            {% endif %} {% if "media" in message %}
-            <a href="images/{{ message['media'] }}" target="_blank"><img src="images/{{ message['media'] }}" loading="lazy" /></a>
+            {% if message['content'] %}
+            <div class="messageContent">{{ message['content']|nl2br|safe }}</div>
+            {% endif %}
+            {% for picture in message['pictures'] %}
+            <a href="{{ picture }}" target="_blank"><img src="{{ picture }}" loading="lazy" /></a>
+            {% endfor %}
+            {% for video_thumbnail in message['video_thumbnails'] %}
+            <a href="https://h5.qzone.qq.com/ugc/share?appid=311&res_uin={{ uin }}&cellid={{ message['tid'] }}"
+                target="_blank"><img src="{{ video_thumbnail }}" loading="lazy" /></a>
+            {% endfor %}
+            {% if message['ocr'] %}
             <div class="ocr">
-                <small><b>OCR</b>: {{ message['ocr'] |escape }}</small>
+                <small><b>OCR</b>: {{ message['ocr']|nl2br|safe }}</small>
             </div>
             {% endif %}
         </li>
         {% endfor %}
     </ul>
     <script>
+        const observer = new IntersectionObserver(entries => {
+            for (const entry of entries) {
+                if (entry.isIntersecting) {
+                    const time = entry.target;
+                    time.innerText = new Date(time.dataset.time).toLocaleString();
+                    observer.unobserve(time);
+                }
+            }
+        });
+
+        {% if year == year_now %}
+        const timeTags = [...document.getElementsByTagName("time")].slice(1);
+        {% else %}
+        const timeTags = document.getElementsByTagName("time");
+        {% endif %}
+
+        for (const time of timeTags) {
+            observer.observe(time);
+        }
+
         const time = document.getElementById("lastUpdate");
         time.innerText = `${new Date(time.innerText).toLocaleString()} (${Intl.DateTimeFormat().resolvedOptions().timeZone
             })`;

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="referrer" content="no-referrer" />
+    <title>{{ nickname }}的空间</title>
+    <script src="https://unpkg.com/autolinker@4.0.0/dist/autolinker.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@1.*/css/pico.min.css" />
+</head>
+
+<body class="container">
+    <h1>
+        <a href="https://user.qzone.qq.com/{{ uin }}/311" target="_blank">{{ nickname }}</a>的空间
+    </h1>
+    <p>
+        Last update: <time datetime="{{ time }}" id="lastUpdate">{{ time }}</time>
+    </p>
+    <ul id="pages">
+        {% for year in years %}
+        <li><a href="{{ year }}.html">{{ year }}年</a></li>
+        {% endfor %}
+    </ul>
+    <script>
+        const time = document.getElementById("lastUpdate");
+        time.innerText = `${new Date(time.innerText).toLocaleString()} (${Intl.DateTimeFormat().resolvedOptions().timeZone
+            })`;
+    </script>
+</body>
+
+</html>
