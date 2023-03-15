@@ -61,7 +61,10 @@ def render_index():
     with open("template_index.html", "r") as f:
         template_content = f.read()
 
-    data = [int(f.split(".")[0]) for f in os.listdir(WORKDIR) if f.endswith(".json")]
+    data = sorted(
+        [int(f.split(".")[0]) for f in os.listdir(WORKDIR) if f.endswith(".json")],
+        reverse=True,
+    )
     template = Template(template_content, autoescape=True)
     output = template.render(
         uin=UIN,

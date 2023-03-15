@@ -1,0 +1,61 @@
+name: Daily update
+
+on:
+  push:
+    branches:
+      - main
+  schedule:
+    - cron: "0 2 * * *" # Every day at 2:00 UTC
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v3
+
+      - name: Checkout dist
+        uses: actions/checkout@v3
+        with:
+          ref: dist
+          path: dist
+
+      - name: Cache PaddleOCR
+        uses: actions/cache@v3
+        with:
+          path: ~/.paddleocr
+          key: ${{ runner.os }}-paddleocr-${{ hashFiles('poetry.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-paddleocr-
+
+      - name: Install poetry
+        run: pipx install poetry
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+          cache: "poetry"
+
+      - name: Install dependencies
+        run: |
+          poetry install
+
+      - name: Add config
+        run: |
+          cp /dev/stdin config.toml << EOF
+          ${{ secrets.CONFIG }}
+          EOF
+
+      - name: Update messages
+        id: download
+        run: poetry run python main.py
+
+      - name: Add & Commit changes
+        if: "${{ steps.download.outputs.messagesAdded != 0 }}"
+        uses: EndBug/add-and-commit@v9
+        with:
+          cwd: "./dist/"
+          default_author: github_actions
+          message: "Update ${{ steps.download.outputs.messagesAdded }} new messages"
