@@ -133,7 +133,7 @@ def dump_messages(dump_new: bool = True, dump_old: bool = True) -> int:
     if dump_new:
         print(f"Dumping new messages before {first_tid}...")
         for emotion in iter_emotions():
-            if emotion.tid == first_tid:
+            if emotion.tid in [m["tid"] for m in messages]:
                 break
             print(count_new, end=": ")
             messages_new.append(dump_emotion(emotion))
