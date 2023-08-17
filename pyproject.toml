@@ -12,7 +12,7 @@ aiohttp = "^3.8.5"
 htmlmin = "^0.1.12"
 jinja2 = "^3.1.2"
 markupsafe = "^2.1.3"
-paddleocr = "^2.6.1.3"
+paddleocr = "^2.7.0.2"
 paddlepaddle = "^2.5.1"
 pillow = "^10.0.0"
 toml = "^0.10.2"
@@ -22,13 +22,13 @@ optional = true
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.7.0"
-flake8 = "^6.0.0"
+flake8 = "^6.1.0"
 
 [tool.poetry.group.ci]
 optional = true
 
 [tool.poetry.group.ci.dependencies]
-selenium = "^4.10.0"
+selenium = "^4.11.2"
 
 [build-system]
 requires = ["poetry-core"]
