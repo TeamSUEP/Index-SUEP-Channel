@@ -13,7 +13,9 @@ from config import (
     AUTO_SAVE_DIR,
     SLEEP_TIME,
     MAX_RETRY,
-    COOKIES,
+    AUTO_UPDATE,
+    AUTO_UPDATE_HEADLESS,
+    AUTO_UPDATE_FORCE,
 )
 from dataclasses import asdict, dataclass
 from irregular_spaces import fix_irregular_spaces
@@ -30,7 +32,31 @@ class Message:
     ocr: str
 
 
-app = qzone.Qzone(**qzone.cookie_str_to_dict(COOKIES))
+def auto_login():
+    from qzone_login_selenium import update_cookies
+
+    update_cookies(headless=AUTO_UPDATE_HEADLESS)
+
+
+def init_app(retry: bool = AUTO_UPDATE) -> bool:
+    from config import COOKIES
+
+    global app
+
+    try:
+        app = qzone.Qzone(**qzone.cookie_str_to_dict(COOKIES))
+        app.emotion_list(uin=UIN, pos=0, num=1)
+        return True
+    except TypeError as e:
+        print("Failed to initialize app. Please check your cookies.")
+        print(e)
+    except KeyError as e:
+        print(f"Failed to get {e}. Maybe your cookies are expired?")
+
+    if retry:
+        auto_login()
+        return init_app(retry=False)
+    return False
 
 
 def check_emotion_loaded(em: qzone.Emotion) -> bool:
@@ -114,6 +140,12 @@ def fix_messages(messages: list[dict]):
 
 
 def dump_messages(dump_new: bool = True, dump_old: bool = True) -> int:
+    if AUTO_UPDATE and AUTO_UPDATE_FORCE:
+        auto_login()
+
+    if not init_app():
+        exit(1)
+
     messages = read_messages()
     messages_new = []
     messages_old = []

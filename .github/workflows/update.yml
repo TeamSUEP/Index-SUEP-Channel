@@ -4,8 +4,8 @@ on:
   push:
     branches:
       - main
-  # schedule:
-  #   - cron: "0 2 * * *" # Every day at 2:00 UTC
+  schedule:
+    - cron: "0 2 * * *" # Every day at 2:00 UTC
   workflow_dispatch:
 
 jobs:
@@ -29,6 +29,14 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-paddleocr-
 
+      - name: Setup chromedriver
+        uses: nanasess/setup-chromedriver@v2
+
+      - run: |
+          export DISPLAY=:99
+          chromedriver --url-base=/wd/hub &
+          sudo Xvfb -ac :99 -screen 0 1280x1024x24 > /dev/null 2>&1 & # optional
+
       - name: Install poetry
         run: pipx install poetry
 
@@ -39,11 +47,11 @@ jobs:
           cache: "poetry"
 
       - name: Install dependencies
-        run: poetry install
+        run: poetry install --with ci
 
       - name: Add config
         run: |
-          cp /dev/stdin config.toml << EOF
+          cat > config.toml << "EOF"
           ${{ secrets.CONFIG }}
           EOF
 

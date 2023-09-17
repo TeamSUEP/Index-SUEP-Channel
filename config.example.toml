@@ -1,8 +1,8 @@
 [project]
 WORKDIR = "./dist/"
 FILE = "2023.json"
-AUTO_SAVE = 10
-AUTO_SAVE_DIR = "/tmp/"
+AUTO_SAVE = 0
+AUTO_SAVE_DIR = "./dist/"
 STEP = 20
 LIMIT = 30000
 SLEEP_TIME = 0.5
@@ -13,8 +13,13 @@ SEARCH_OFFSET = 0
 UIN = 1399896037
 NICKNAME = "上海电力大学表白墙"
 COOKIES = ""
+AUTO_UPDATE = false
+AUTO_UPDATE_HEADLESS = false
+AUTO_UPDATE_FORCE = false
+AUTO_UPDATE_USER = ""
+AUTO_UPDATE_PASS = ""
 
 [paddleocr]
 USE_GPU = false
-USE_MP = false
-TOTAL_PROCESS_NUM = 1
+USE_MP = true
+TOTAL_PROCESS_NUM = 2

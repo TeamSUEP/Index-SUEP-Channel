@@ -14,6 +14,8 @@ class Config:
             toml.dump(self.config, f)
 
     def set_cookies(self, cookies):
+        global COOKIES
+        COOKIES = cookies
         self.config["qzone"]["COOKIES"] = cookies
         self.save_config()
 
@@ -37,11 +39,14 @@ SLEEP_TIME = config["project"]["SLEEP_TIME"]
 MAX_RETRY = config["project"]["MAX_RETRY"]
 SEARCH_OFFSET = config["project"]["SEARCH_OFFSET"]
 
-USER = config["qzone"]["USER"]
-PASS = config["qzone"]["PASS"]
 UIN = config["qzone"]["UIN"]
 NICKNAME = config["qzone"]["NICKNAME"]
 COOKIES = config["qzone"]["COOKIES"]
+AUTO_UPDATE = config["qzone"]["AUTO_UPDATE"]
+AUTO_UPDATE_HEADLESS = config["qzone"]["AUTO_UPDATE_HEADLESS"]
+AUTO_UPDATE_FORCE = config["qzone"]["AUTO_UPDATE_FORCE"]
+AUTO_UPDATE_USER = config["qzone"]["AUTO_UPDATE_USER"]
+AUTO_UPDATE_PASS = config["qzone"]["AUTO_UPDATE_PASS"]
 
 USE_GPU = config["paddleocr"]["USE_GPU"]
 USE_MP = config["paddleocr"]["USE_MP"]
