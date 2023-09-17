@@ -1,11 +1,23 @@
 import json
-import toml
 import os
 import pathlib
 import qzone
-from dataclasses import dataclass, asdict
-from time import sleep
+from config import (
+    UIN,
+    WORKDIR,
+    FILE,
+    STEP,
+    SEARCH_OFFSET,
+    LIMIT,
+    AUTO_SAVE,
+    AUTO_SAVE_DIR,
+    SLEEP_TIME,
+    MAX_RETRY,
+    COOKIES,
+)
+from dataclasses import asdict, dataclass
 from irregular_spaces import fix_irregular_spaces
+from time import sleep
 
 
 @dataclass
@@ -17,19 +29,6 @@ class Message:
     ctime: int
     ocr: str
 
-
-config = toml.load("config.toml")
-UIN = config["qzone"]["UIN"]
-WORKDIR = config["project"]["WORKDIR"]
-FILE = config["project"]["FILE"]
-STEP = config["project"]["STEP"]
-SEARCH_OFFSET = config["project"]["SEARCH_OFFSET"]
-LIMIT = config["project"]["LIMIT"]
-AUTO_SAVE = config["project"]["AUTO_SAVE"]
-AUTO_SAVE_DIR = config["project"]["AUTO_SAVE_DIR"]
-SLEEP_TIME = config["project"]["SLEEP_TIME"]
-MAX_RETRY = config["project"]["MAX_RETRY"]
-COOKIES = config["qzone"]["COOKIES"]
 
 app = qzone.Qzone(**qzone.cookie_str_to_dict(COOKIES))
 
@@ -177,4 +176,10 @@ def dump_messages(dump_new: bool = True, dump_old: bool = True) -> int:
 
 
 if __name__ == "__main__":
-    dump_messages(dump_new=True, dump_old=True)
+    import argparse
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--new", action="store_true")
+    parser.add_argument("--old", action="store_true")
+    args = parser.parse_args()
+    dump_messages(dump_new=args.new, dump_old=args.old)

@@ -1,17 +1,12 @@
 import htmlmin
 import json
 import os
-import toml
 import re
+from config import UIN, NICKNAME, WORKDIR
 from datetime import datetime, timezone
 from jinja2 import Template, pass_eval_context
-from markupsafe import Markup, escape
 from jinja2.defaults import DEFAULT_FILTERS
-
-config = toml.load("config.toml")
-UIN = config["qzone"]["UIN"]
-NICKNAME = config["qzone"]["NICKNAME"]
-WORKDIR = config["project"]["WORKDIR"]
+from markupsafe import Markup, escape
 
 
 @pass_eval_context

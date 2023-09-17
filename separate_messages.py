@@ -1,5 +1,5 @@
-import json
 import datetime
+import json
 
 with open("dist/messages.json", "r", encoding="utf-8") as f:
     messages = json.load(f)

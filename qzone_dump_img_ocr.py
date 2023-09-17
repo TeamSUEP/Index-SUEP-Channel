@@ -1,21 +1,13 @@
-import asyncio
 import aiohttp
-import logging
-import toml
+import asyncio
 import io
-from qzone_dump import read_messages, write_messages
-from paddleocr import PaddleOCR
+import logging
+from config import AUTO_SAVE, AUTO_SAVE_DIR, USE_GPU, USE_MP, TOTAL_PROCESS_NUM
 from PIL import Image
+from paddleocr import PaddleOCR
+from qzone_dump import read_messages, write_messages
 
-config = toml.load("config.toml")
-UIN = config["qzone"]["UIN"]
-WORKDIR = config["project"]["WORKDIR"]
-AUTO_SAVE = config["project"]["AUTO_SAVE"]
-AUTO_SAVE_DIR = config["project"]["AUTO_SAVE_DIR"]
 
-USE_GPU = config["paddleocr"]["USE_GPU"]
-USE_MP = config["paddleocr"]["USE_MP"]
-TOTAL_PROCESS_NUM = config["paddleocr"]["TOTAL_PROCESS_NUM"]
 ocr = PaddleOCR(
     use_angle_cls=True,
     lang="ch",
@@ -40,7 +32,10 @@ async def ocr_message(session, message):
                 img_byte_arr = io.BytesIO()
                 Image.open(io.BytesIO(img)).save(img_byte_arr, format="PNG")
                 img = img_byte_arr.getvalue()
-            ocr_result = "".join([line[1][0] for line in recognize_text(img)]).strip()
+            ocr_result = recognize_text(img)
+            if ocr_result is None:
+                continue
+            ocr_result = "".join([line[1][0] for line in ocr_result]).strip()
             if len(ocr_result) > 0:
                 message["ocr"] += f"P{index + 1}: "
                 message["ocr"] += ocr_result
@@ -49,7 +44,7 @@ async def ocr_message(session, message):
 
 async def ocr_messages():
     messages = read_messages()
-    print(f"OCRing messages...")
+    print("OCRing messages...")
     async with aiohttp.ClientSession() as session:
         count = 0
         for message in messages:

@@ -49,7 +49,7 @@ jobs:
 
       - name: Update messages
         id: download
-        run: poetry run python main.py
+        run: poetry run python main.py --new
 
       - name: Add & Commit changes
         if: "${{ steps.download.outputs.messagesAdded != 0 }}"

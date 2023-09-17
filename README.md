@@ -51,7 +51,7 @@ QQ 空间 Cookies 获取方法：
 ### 运行
 
 ```bash
-poetry run python main.py
+poetry run python main.py --new
 ```
 
 ## 许可证
