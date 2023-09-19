@@ -1,4 +1,11 @@
-from config import config, AUTO_UPDATE_USER, AUTO_UPDATE_PASS
+from config import (
+    config,
+    AUTO_UPDATE_USER,
+    AUTO_UPDATE_PASS,
+    AUTO_UPDATE_HEADLESS,
+    AUTO_UPDATE_PROXY,
+    AUTO_UPDATE_TIMEOUT,
+)
 from selenium import webdriver
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.chrome.options import Options
@@ -8,8 +15,13 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
 
-def update_cookies(headless=False, proxy=""):
-    timeout = 20
+def update_cookies(
+    username=AUTO_UPDATE_USER,
+    password=AUTO_UPDATE_PASS,
+    headless=AUTO_UPDATE_HEADLESS,
+    proxy=AUTO_UPDATE_PROXY,
+    timeout=AUTO_UPDATE_TIMEOUT,
+):
     print("Updating cookies...")
 
     options = Options()
@@ -59,9 +71,9 @@ def update_cookies(headless=False, proxy=""):
     driver.find_element(By.ID, "switcher_plogin").click()
 
     driver.find_element(By.ID, "u").clear()
-    driver.find_element(By.ID, "u").send_keys(AUTO_UPDATE_USER)
+    driver.find_element(By.ID, "u").send_keys(username)
     driver.find_element(By.ID, "p").clear()
-    driver.find_element(By.ID, "p").send_keys(AUTO_UPDATE_PASS)
+    driver.find_element(By.ID, "p").send_keys(password)
 
     driver.execute_script(
         "document.getElementById('login_button').parentNode.hidefocus=false;"
@@ -108,8 +120,17 @@ if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser()
+    parser.add_argument("--username", default=AUTO_UPDATE_USER)
+    parser.add_argument("--password", default=AUTO_UPDATE_PASS)
     parser.add_argument("--headless", action="store_true")
     parser.add_argument("--proxy", default="")
+    parser.add_argument("--timeout", type=int, default=AUTO_UPDATE_TIMEOUT)
     args = parser.parse_args()
 
-    update_cookies(args.headless, args.proxy)
+    update_cookies(
+        username=args.username,
+        password=args.password,
+        headless=args.headless,
+        proxy=args.proxy,
+        timeout=args.timeout,
+    )

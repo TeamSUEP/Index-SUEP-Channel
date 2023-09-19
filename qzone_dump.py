@@ -14,9 +14,7 @@ from config import (
     SLEEP_TIME,
     MAX_RETRY,
     AUTO_UPDATE,
-    AUTO_UPDATE_HEADLESS,
     AUTO_UPDATE_FORCE,
-    AUTO_UPDATE_PROXY,
 )
 from dataclasses import asdict, dataclass
 from irregular_spaces import fix_irregular_spaces
@@ -36,7 +34,7 @@ class Message:
 def auto_login():
     from qzone_login_selenium import update_cookies
 
-    update_cookies(headless=AUTO_UPDATE_HEADLESS, proxy=AUTO_UPDATE_PROXY)
+    update_cookies()
 
 
 def init_app(retry: bool = AUTO_UPDATE) -> bool:

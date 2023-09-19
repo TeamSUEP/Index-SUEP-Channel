@@ -37,11 +37,12 @@ vim config.toml
 | NICKNAME             | 目标 QQ 昵称                               |
 | COOKIES              | QQ 空间 Cookies                            |
 | AUTO_UPDATE          | 是否使用 selenium 自动更新 QQ 空间 Cookies |
-| AUTO_UPDATE_HEADLESS | 自动更新是否使用无头模式                   |
 | AUTO_UPDATE_FORCE    | 自动更新是否跳过检查强制更新               |
 | AUTO_UPDATE_USER     | 用于自动更新 QQ 空间 Cookies 的 QQ 号      |
 | AUTO_UPDATE_PASS     | 用于自动更新 QQ 空间 Cookies 的 QQ 密码    |
+| AUTO_UPDATE_HEADLESS | 自动更新是否使用无头模式                   |
 | AUTO_UPDATE_PROXY    | 用于自动更新 QQ 空间 Cookies 的代理        |
+| AUTO_UPDATE_TIMEOUT  | 自动更新超时时间，单位为秒                 |
 | USE_GPU              | OCR 是否使用 GPU                           |
 | USE_MP               | OCR 是否使用多进程                         |
 | TOTAL_PROCESS_NUM    | OCR 总进程数                               |
