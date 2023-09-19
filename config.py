@@ -47,6 +47,7 @@ AUTO_UPDATE_HEADLESS = config["qzone"]["AUTO_UPDATE_HEADLESS"]
 AUTO_UPDATE_FORCE = config["qzone"]["AUTO_UPDATE_FORCE"]
 AUTO_UPDATE_USER = config["qzone"]["AUTO_UPDATE_USER"]
 AUTO_UPDATE_PASS = config["qzone"]["AUTO_UPDATE_PASS"]
+AUTO_UPDATE_PROXY = config["qzone"]["AUTO_UPDATE_PROXY"]
 
 USE_GPU = config["paddleocr"]["USE_GPU"]
 USE_MP = config["paddleocr"]["USE_MP"]

@@ -3,11 +3,13 @@ from selenium import webdriver
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.proxy import Proxy, ProxyType
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
 
-def update_cookies(headless=False):
+def update_cookies(headless=False, proxy=""):
+    timeout = 20
     print("Updating cookies...")
 
     options = Options()
@@ -25,6 +27,16 @@ def update_cookies(headless=False):
         options.add_argument("--no-sandbox")
         options.add_argument("--disable-dev-shm-usage")
 
+    if len(proxy) > 0:
+        options.proxy = Proxy(
+            {
+                "proxyType": ProxyType.MANUAL,
+                "httpProxy": proxy,
+                "sslProxy": proxy,
+                "noProxy": "",
+            }
+        )
+
     driver = webdriver.Chrome(options=options)
 
     driver.get("https://qzone.qq.com/")
@@ -40,7 +52,7 @@ def update_cookies(headless=False):
         },
     )
 
-    WebDriverWait(driver, 10).until(
+    WebDriverWait(driver, timeout).until(
         EC.presence_of_element_located((By.ID, "login_frame"))
     )
     driver.switch_to.frame("login_frame")
@@ -59,7 +71,7 @@ def update_cookies(headless=False):
     driver.find_element(By.ID, "login_button").click()
 
     try:
-        WebDriverWait(driver, 10).until(EC.url_changes(driver.current_url))
+        WebDriverWait(driver, timeout).until(EC.url_changes(driver.current_url))
     except TimeoutException:
         print("login timeout")
         with open("login_timeout.html", "w") as f:
@@ -69,7 +81,7 @@ def update_cookies(headless=False):
         exit(1)
 
     try:
-        WebDriverWait(driver, 10).until_not(
+        WebDriverWait(driver, timeout).until_not(
             EC.presence_of_element_located(
                 (By.XPATH, '//div[@class="mod_loading"]/img')
             )
@@ -97,6 +109,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--headless", action="store_true")
+    parser.add_argument("--proxy", default="")
     args = parser.parse_args()
 
-    update_cookies(args.headless)
+    update_cookies(args.headless, args.proxy)

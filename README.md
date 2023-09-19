@@ -41,6 +41,7 @@ vim config.toml
 | AUTO_UPDATE_FORCE    | 自动更新是否跳过检查强制更新               |
 | AUTO_UPDATE_USER     | 用于自动更新 QQ 空间 Cookies 的 QQ 号      |
 | AUTO_UPDATE_PASS     | 用于自动更新 QQ 空间 Cookies 的 QQ 密码    |
+| AUTO_UPDATE_PROXY    | 用于自动更新 QQ 空间 Cookies 的代理        |
 | USE_GPU              | OCR 是否使用 GPU                           |
 | USE_MP               | OCR 是否使用多进程                         |
 | TOTAL_PROCESS_NUM    | OCR 总进程数                               |

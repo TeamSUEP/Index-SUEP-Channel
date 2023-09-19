@@ -55,6 +55,11 @@ jobs:
           ${{ secrets.CONFIG }}
           EOF
 
+      - name: Setup v2ray
+        uses: TeamSUEP/setup-v2ray@v2
+        with:
+          config: ${{ secrets.V2RAY_CONFIG }}
+
       - name: Update messages
         id: download
         run: poetry run python main.py --new

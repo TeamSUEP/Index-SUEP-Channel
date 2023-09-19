@@ -18,6 +18,7 @@ AUTO_UPDATE_HEADLESS = false
 AUTO_UPDATE_FORCE = false
 AUTO_UPDATE_USER = ""
 AUTO_UPDATE_PASS = ""
+AUTO_UPDATE_PROXY = ""
 
 [paddleocr]
 USE_GPU = false

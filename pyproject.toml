@@ -24,6 +24,7 @@ optional = true
 [tool.poetry.group.dev.dependencies]
 black = "^23.9.1"
 flake8 = "^6.1.0"
+pynacl = "^1.5.0"
 
 [tool.poetry.group.ci]
 optional = true
