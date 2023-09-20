@@ -58,6 +58,11 @@ jobs:
           ${{ secrets.CONFIG }}
           EOF
 
+      - name: Set timezone
+        uses: szenius/set-timezone@v1.2
+        with:
+          timezoneLinux: "Asia/Shanghai"
+
       - name: Setup v2ray
         uses: TeamSUEP/setup-v2ray@v2
         with:
