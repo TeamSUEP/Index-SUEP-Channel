@@ -1,31 +1,295 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="referrer" content="no-referrer" />
-    <title>{{ nickname }}的空间</title>
+    <title>{{ nickname }}</title>
     <script src="https://unpkg.com/autolinker@4.0.0/dist/autolinker.min.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@1.*/css/pico.min.css" />
+    <style>
+        .ocr {
+            line-height: 1.1;
+            opacity: 0.75;
+        }
+
+        img {
+            max-width: 200px;
+            max-height: 200px;
+        }
+    </style>
 </head>
 
 <body class="container">
     <h1>
-        <a href="https://user.qzone.qq.com/{{ uin }}/311" target="_blank">{{ nickname }}</a>的空间
+        <a href="https://user.qzone.qq.com/{{ uin }}/311" target="_blank">{{ nickname }}</a>
     </h1>
     <p>
-        Last update: <time datetime="{{ time }}" id="lastUpdate">{{ time }}</time>
+        最后更新： <time datetime="{{ time }}" id="lastUpdate">{{ time }}</time>
     </p>
     <ul id="pages">
         {% for year in years %}
         <li><a href="{{ year }}.html">{{ year }}年</a></li>
         {% endfor %}
     </ul>
+    <div id="messages"></div>
     <script>
         const time = document.getElementById("lastUpdate");
         time.innerText = `${new Date(time.innerText).toLocaleString()} (${Intl.DateTimeFormat().resolvedOptions().timeZone
             })`;
+
+        function updateTime(time) {
+            time.innerText = new Date(time.dataset.time * 1000).toLocaleString();
+        }
+
+        const timeObserver = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const time = entry.target;
+                    updateTime(time);
+                    time.classList.add("updated");
+                    timeObserver.unobserve(time);
+                }
+            });
+        });
+
+        function observeNewTime() {
+            const timeTags = document.querySelectorAll(`time:not([id="lastUpdate"]):not(.updated)`);
+
+            timeTags.forEach(time => {
+                timeObserver.observe(time);
+            });
+        }
+
+        var autolinker = new Autolinker({
+            urls: {
+                schemeMatches: true,
+                tldMatches: true,
+                ipV4Matches: true,
+            },
+            email: true,
+            phone: true,
+            mention: false,
+            hashtag: false,
+
+            stripPrefix: false,
+            stripTrailingSlash: true,
+            newWindow: true,
+
+            truncate: {
+                length: 0,
+                location: "smart",
+            },
+
+            className: "",
+        });
+
+        function linkify(node) {
+            const nodes = [...node.childNodes];
+            for (var n of nodes) {
+                if (n.nodeType == n.TEXT_NODE) {
+                    const newText = autolinker.link(n.textContent);
+                    if (newText == n.textContent) {
+                        continue;
+                    }
+                    const fragment = document.createRange().createContextualFragment(newText);
+                    n.replaceWith(fragment);
+                    // console.log("replace fragment", fragment);
+                } else {
+                    linkify(n);
+                }
+            }
+        }
+
+        const messageContentObserver = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const messageContent = entry.target;
+                    linkify(messageContent);
+                    messageContent.classList.add("updated");
+                    messageContentObserver.unobserve(messageContent);
+                }
+            });
+        });
+
+        function observeNewMessageContent() {
+            const messageContents = document.querySelectorAll(`.messageContent:not(.updated)`);
+
+            messageContents.forEach(messageContent => {
+                messageContentObserver.observe(messageContent);
+            });
+        }
+
+        observeNewTime();
+        observeNewMessageContent();
+    </script>
+    <script>
+        function nl2br(value) {
+            const br = "<br>\n";
+            let result = '';
+            const paragraphs = value.split(/\n\s*\n/);
+            for (const paragraph of paragraphs) {
+                const lines = paragraph.split(/\r?\n/);
+                const formattedLines = lines.map(line => {
+                    return line + br;
+                });
+                result += `<p>${formattedLines.join('')}</p>`;
+            }
+            return result;
+        }
+
+        function loadData(year, month, callback) {
+            const path = month ? `data/months/${year}/${month}` : `data/years/${year}`;
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', `${path}.json`, true);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    if (xhr.status !== 200) {
+                        callback(null, xhr.status);
+                    } else {
+                        const jsonData = JSON.parse(xhr.responseText);
+                        callback(jsonData, null);
+                    }
+                }
+            };
+            xhr.send();
+        }
+
+        function renderData(year, month, jsonData) {
+            const dataContainer = document.getElementById('messages');
+            if (jsonData) {
+                const html = `
+                    <ul>${jsonData.map(message => `
+                        <li id="message-${message['tid']}">
+                            <div class="messageId">
+                                <a href="https://h5.qzone.qq.com/ugc/share?appid=311&res_uin={{ uin }}&cellid=${message['tid']}" target="_blank">#${message['tid']}</a>
+                                <time data-time="${message['ctime']}"></time>
+                            </div>
+                            ${message['content'] ? `<div class="messageContent">${nl2br(message['content'])}</div>` : ''}
+                            ${message['pictures'].map(picture => `<a href="${picture}" target="_blank"><img src="${picture}" loading="lazy" /></a>`).join('')}
+                            ${message['video_thumbnails'].map(video_thumbnail => `<a href="https://h5.qzone.qq.com/ugc/share?appid=311&res_uin={{ uin }}&cellid=${message['tid']}" target="_blank"><img src="${video_thumbnail}" loading="lazy" /></a>`).join('')}
+                            ${message['ocr'] ? `<div class="ocr"><small><b>OCR</b>: ${nl2br(message['ocr'])}</small></div>` : ''}
+                        </li>`).join('')}
+                    </ul>`;
+
+                dataContainer.insertAdjacentHTML('beforeend', html);
+                observeNewTime();
+                observeNewMessageContent();
+            } else {
+                const html = `<div class="alert"><p>加载失败</p></div>`;
+                dataContainer.insertAdjacentHTML('beforeend', html);
+            }
+        }
+
+        function displayHeader(year, month) {
+            const dataContainer = document.getElementById('messages');
+            const header = `<h2>${year}年${month ? month + '月' : ''}</h2>`;
+            dataContainer.insertAdjacentHTML('beforeend', header);
+        }
+
+        function displayError(message) {
+            const dataContainer = document.getElementById('messages');
+            const html = `<div class="alert"><p>${message}</p></div>`;
+            dataContainer.insertAdjacentHTML('beforeend', html);
+        }
+
+        function getErrorDescription(error) {
+            switch (error) {
+                case 404:
+                    return "数据不存在，请检查路径是否正确。";
+                case 500:
+                    return "服务器内部错误，请稍后重试。";
+                default:
+                    return `HTTP ${error} 错误发生。`;
+            }
+        }
+
+        function loadDataPromise(year, month) {
+            return new Promise((resolve, reject) => {
+                loadData(year, month, (jsonData, error) => {
+                    if (error) {
+                        reject(error);
+                    } else {
+                        resolve(jsonData);
+                    }
+                });
+            });
+        }
+
+        async function loadAndRenderData(year, month, maxRetries = 3) {
+            displayHeader(year, month);
+
+            let retryCount = 0;
+
+            while (retryCount < maxRetries) {
+                try {
+                    const jsonData = await loadDataPromise(year, month);
+                    renderData(year, month, jsonData);
+                    return;
+                } catch (error) {
+                    console.error(`Failed to load data for ${year}-${month}: ${getErrorDescription(error)}`);
+                    displayError(`加载数据失败：${getErrorDescription(error)}`);
+                    retryCount++;
+                }
+            }
+
+            console.error(`Max retries reached for ${year}-${month}. Skipping this month's data.`);
+            displayError(`已达到最大重试次数，跳过 ${year}-${month} 的数据。`);
+        }
+
+        let currentYear = new Date().getFullYear();
+        let currentMonth = new Date().getMonth() + 1;
+        let isLoading = false;
+
+        async function loadAndIncrement() {
+            if (isLoading) {
+                return;
+            }
+            isLoading = true;
+
+            try {
+                await loadAndRenderData(currentYear.toString(), currentMonth.toString().padStart(2, '0'))
+                    .catch((error) => {
+                        console.error(`Failed to load and render data: ${error}`);
+                    });
+
+                if (currentMonth === 1) {
+                    currentYear--;
+                    currentMonth = 12;
+                } else {
+                    currentMonth--;
+                }
+            } catch (error) {
+                console.error(`Failed to load data: HTTP ${error}`);
+            } finally {
+                isLoading = false;
+            }
+        }
+
+        loadAndIncrement();
+
+        function isAtBottom(offset = 100) {
+            const scrollHeight = document.documentElement.scrollHeight;
+            const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+            const clientHeight = document.documentElement.clientHeight;
+            return scrollTop + clientHeight + offset >= scrollHeight;
+        }
+
+        function throttle(func, delay) {
+            let timeoutId;
+            return function (...args) {
+                if (!timeoutId && isAtBottom()) {
+                    timeoutId = setTimeout(() => {
+                        func(...args);
+                        timeoutId = null;
+                    }, delay);
+                }
+            };
+        }
+
+        const throttledScrollHandler = throttle(loadAndIncrement, 500);
+        window.addEventListener('scroll', throttledScrollHandler);
     </script>
 </body>
 

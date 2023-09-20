@@ -1,7 +1,7 @@
 [project]
 WORKDIR = "./dist/"
-FILE = "2023.json"
-AUTO_SAVE = 0
+FILE = "data/years/2023.json"
+AUTO_SAVE = 1
 AUTO_SAVE_DIR = "./dist/"
 STEP = 20
 LIMIT = 30000

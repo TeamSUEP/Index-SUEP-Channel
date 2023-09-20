@@ -1,8 +1,11 @@
 import argparse
 import asyncio
 import os
+import time
 from qzone_dump import dump_messages
 from render_data import render_messages, render_index
+from separate_messages import split_year
+
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--new", action="store_true")
@@ -16,6 +19,8 @@ if count > 0:
 
     loop = asyncio.get_event_loop()
     loop.run_until_complete(ocr_messages())
+    current_year = time.strftime("%Y", time.localtime())
+    split_year(f"dist/data/years/{current_year}.json", "dist/data/months", current_year)
     render_messages()
     render_index()
 

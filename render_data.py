@@ -31,7 +31,7 @@ def datetime_fromtimestamp(timestamp):
 def render_messages(year: int = datetime.now().year):
     with open("template.html", "r") as f:
         template_content = f.read()
-    with open(f"{WORKDIR}/{year}.json", "r") as f:
+    with open(f"{WORKDIR}/data/years/{year}.json", "r") as f:
         data = json.load(f)
 
     DEFAULT_FILTERS["nl2br"] = nl2br
@@ -56,15 +56,15 @@ def render_index():
     with open("template_index.html", "r") as f:
         template_content = f.read()
 
-    data = sorted(
-        [int(f.split(".")[0]) for f in os.listdir(WORKDIR) if f.endswith(".json")],
+    years = sorted(
+        [int(f.split(".")[0]) for f in os.listdir(f"{WORKDIR}/data/years")],
         reverse=True,
     )
     template = Template(template_content, autoescape=True)
     output = template.render(
         uin=UIN,
         nickname=NICKNAME,
-        years=data,
+        years=years,
         time=datetime.now(tz=timezone.utc).isoformat(),
     )
     output = htmlmin.minify(output)
