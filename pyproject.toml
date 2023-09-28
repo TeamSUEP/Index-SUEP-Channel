@@ -24,13 +24,13 @@ optional = true
 [tool.poetry.group.dev.dependencies]
 black = "^23.9.1"
 flake8 = "^6.1.0"
-pynacl = "^1.5.0"
 
 [tool.poetry.group.ci]
 optional = true
 
 [tool.poetry.group.ci.dependencies]
-selenium = "^4.12.0"
+pynacl = "^1.5.0"
+selenium = "^4.13.0"
 
 [build-system]
 requires = ["poetry-core"]

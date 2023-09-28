@@ -72,6 +72,9 @@ jobs:
         id: download
         run: poetry run python main.py --new
 
+      - name: Save config to GitHub secret
+        run: poetry run python update_github_secret.py
+
       - name: Add & Commit changes
         if: "${{ steps.download.outputs.messagesAdded != 0 }}"
         uses: EndBug/add-and-commit@v9
