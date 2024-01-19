@@ -17,6 +17,7 @@ paddleocr = "^2.7.0.3"
 paddlepaddle = "^2.5.1"
 pillow = "^10.0.1"
 toml = "^0.10.2"
+setuptools = "^69.0.3"
 
 [tool.poetry.group.dev]
 optional = true
