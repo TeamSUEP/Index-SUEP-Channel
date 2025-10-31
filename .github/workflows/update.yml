@@ -27,18 +27,18 @@ jobs:
       - name: Cache PaddleOCR
         uses: actions/cache@v3
         with:
-          path: ~/.paddleocr
-          key: ${{ runner.os }}-paddleocr-${{ hashFiles('poetry.lock') }}
+          path: ~/.paddlex
+          key: ${{ runner.os }}-paddlex-${{ hashFiles('poetry.lock') }}
           restore-keys: |
-            ${{ runner.os }}-paddleocr-
+            ${{ runner.os }}-paddlex-
 
-      - name: Setup chromedriver
-        uses: nanasess/setup-chromedriver@v2
+      # - name: Setup chromedriver
+      #   uses: nanasess/setup-chromedriver@v2
 
-      - run: |
-          export DISPLAY=:99
-          chromedriver --url-base=/wd/hub &
-          sudo Xvfb -ac :99 -screen 0 1280x1024x24 > /dev/null 2>&1 & # optional
+      # - run: |
+      #     export DISPLAY=:99
+      #     chromedriver --url-base=/wd/hub &
+      #     sudo Xvfb -ac :99 -screen 0 1280x1024x24 > /dev/null 2>&1 & # optional
 
       - name: Install poetry
         run: pipx install poetry
@@ -50,7 +50,7 @@ jobs:
           cache: "poetry"
 
       - name: Install dependencies
-        run: poetry install --with ci
+        run: poetry install # --with ci
 
       - name: Add config
         run: |
@@ -63,17 +63,17 @@ jobs:
         with:
           timezoneLinux: "Asia/Shanghai"
 
-      - name: Setup v2ray
-        uses: TeamSUEP/setup-v2ray@v2
-        with:
-          config: ${{ secrets.V2RAY_CONFIG }}
+      # - name: Setup v2ray
+      #   uses: TeamSUEP/setup-v2ray@v2
+      #   with:
+      #     config: ${{ secrets.V2RAY_CONFIG }}
 
       - name: Update messages
         id: download
         run: poetry run python main.py --new
 
-      - name: Save config to GitHub secret
-        run: poetry run python update_github_secret.py
+      # - name: Save config to GitHub secret
+      #   run: poetry run python update_github_secret.py
 
       - name: Add & Commit changes
         if: "${{ steps.download.outputs.messagesAdded != 0 }}"
