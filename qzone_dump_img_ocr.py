@@ -40,9 +40,13 @@ async def ocr_message(session, message):
                 Image.open(io.BytesIO(img)).save(img_byte_arr, format="PNG")
                 img = img_byte_arr.getvalue()
 
-            img_obj = Image.open(io.BytesIO(img))
-            img_array = np.array(img_obj)
-            ocr_result = recognize_text(img_array)
+            img_obj = Image.open(io.BytesIO(img)).convert("RGB")
+            img_array = np.ascontiguousarray(np.array(img_obj))
+            try:
+                ocr_result = recognize_text(img_array)
+            except Exception as e:
+                logger.exception("OCR failed for image %s: %s", picture_url, e)
+                continue
 
             if ocr_result is None or len(ocr_result) == 0:
                 continue
